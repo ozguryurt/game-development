@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float speed = 5f;
-    public float jumpForce = 7f;
+    public float jumpForce = 12f;
     private Animator animator;
     private Rigidbody2D rb;
     private Vector2 movement;
@@ -20,11 +20,13 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
 
         // Hareket animasyonu sadece saldırı yokken güncellensin
         if (!isAttacking)
         {
             animator.SetFloat("Speed", Mathf.Abs(movement.x));
+            animator.SetFloat("VerticalSpeed", Mathf.Abs(movement.y));
         }
 
         // Zıplama (sadece yere değdiğinde)
@@ -61,14 +63,16 @@ public class PlayerController : MonoBehaviour
 
     void Attack()
     {
-        isAttacking = true;
-        animator.SetBool("isAttacking", true);
+        if(!isAttacking) {
+            isAttacking = true;
+            animator.SetBool("isAttacking", true);
 
-        // AttackAnim1 animasyon süresini al
-        float attackDuration = GetAttackAnimationLength();
-        
-        // Saldırı bitince durumu sıfırla
-        Invoke("ResetAttack", attackDuration);
+            // AttackAnim1 animasyon süresini al
+            float attackDuration = GetAttackAnimationLength();
+            
+            // Saldırı bitince durumu sıfırla
+            Invoke("ResetAttack", attackDuration);
+        }
     }
 
     void ResetAttack()
@@ -83,7 +87,7 @@ public class PlayerController : MonoBehaviour
         AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
         foreach (AnimationClip clip in clips)
         {
-            if (clip.name == "AttackAnim1")
+            if (clip.name == "AttackAnim1" || clip.name == "Wizard_AttackAnim")
             {
                 return clip.length;
             }

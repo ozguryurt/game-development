@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ee0a7ebd79d7b30459cd6f8d1f4e946a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 284492
+  packageName: Evil Wizard 3
+  packageVersion: 1.0
+  assetPath: Assets/Evil Wizard 3/Animations/Idle.anim
+  uploadId: 666277

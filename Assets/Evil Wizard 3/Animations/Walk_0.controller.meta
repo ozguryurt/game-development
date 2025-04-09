@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 17bb526a89635284f959b51a2b591d30
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 284492
+  packageName: Evil Wizard 3
+  packageVersion: 1.0
+  assetPath: Assets/Evil Wizard 3/Animations/Walk_0.controller
+  uploadId: 666277

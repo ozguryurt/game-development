@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ba20e24f05ffc5e4ea978734f2b75c5e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 284492
+  packageName: Evil Wizard 3
+  packageVersion: 1.0
+  assetPath: Assets/Evil Wizard 3/Animations/Jump.anim
+  uploadId: 666277

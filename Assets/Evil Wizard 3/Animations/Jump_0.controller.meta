@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e7901e6837ff50e45bb0f36d34497248
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 284492
+  packageName: Evil Wizard 3
+  packageVersion: 1.0
+  assetPath: Assets/Evil Wizard 3/Animations/Jump_0.controller
+  uploadId: 666277
