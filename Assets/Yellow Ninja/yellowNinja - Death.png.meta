@@ -193,6 +193,19 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -847,7 +860,36 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      yellowNinja - Death_0: -6212838494299309301
+      yellowNinja - Death_1: 807614261999525968
+      yellowNinja - Death_10: -4221874074663592195
+      yellowNinja - Death_11: 4697944178388943755
+      yellowNinja - Death_12: -5924083163500727583
+      yellowNinja - Death_13: 7367151152328585919
+      yellowNinja - Death_14: -7242444543435872516
+      yellowNinja - Death_15: 1912560377592533495
+      yellowNinja - Death_16: 8926255207237987223
+      yellowNinja - Death_17: 6489770194073530605
+      yellowNinja - Death_18: -3261077983232019918
+      yellowNinja - Death_19: -1455671263376591111
+      yellowNinja - Death_2: 5138166960660968154
+      yellowNinja - Death_20: 6621141952371366938
+      yellowNinja - Death_21: 443622397676035642
+      yellowNinja - Death_22: 9130912959285363125
+      yellowNinja - Death_23: 8606009864389648963
+      yellowNinja - Death_24: -4860442397849737675
+      yellowNinja - Death_25: -6108900302099569368
+      yellowNinja - Death_26: 6612272931034885129
+      yellowNinja - Death_27: 4811715053784766606
+      yellowNinja - Death_28: -2275447528572790814
+      yellowNinja - Death_3: 7804122915256926337
+      yellowNinja - Death_4: -6926261800393936539
+      yellowNinja - Death_5: -4118166077888923846
+      yellowNinja - Death_6: 8357354178667993316
+      yellowNinja - Death_7: 2209300320406958419
+      yellowNinja - Death_8: 7962706505400897930
+      yellowNinja - Death_9: 1251973404325365152
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

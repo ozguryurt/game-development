@@ -166,6 +166,19 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -622,7 +635,27 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      yellowNinja - attack_0: -371128905726686782
+      yellowNinja - attack_1: -7361820261545525295
+      yellowNinja - attack_10: 3656528083181497312
+      yellowNinja - attack_11: -4151532842496503352
+      yellowNinja - attack_12: -1272795299234129339
+      yellowNinja - attack_13: -1597032284425408420
+      yellowNinja - attack_14: -1286453775482830377
+      yellowNinja - attack_15: 5908979291313137607
+      yellowNinja - attack_16: -8765397996661390644
+      yellowNinja - attack_17: 2837599787924024480
+      yellowNinja - attack_18: 4357867798145374320
+      yellowNinja - attack_19: -1312310550153676653
+      yellowNinja - attack_2: -8363650675703715988
+      yellowNinja - attack_3: -81355319158978230
+      yellowNinja - attack_4: 3305408546912355875
+      yellowNinja - attack_5: 6783577642651545438
+      yellowNinja - attack_6: -3355456968156199291
+      yellowNinja - attack_7: -8887661413788427986
+      yellowNinja - attack_8: -6226544559279949092
+      yellowNinja - attack_9: -3662899354654702095
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
