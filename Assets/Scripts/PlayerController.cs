@@ -87,7 +87,7 @@ public class PlayerController : MonoBehaviour
         AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
         foreach (AnimationClip clip in clips)
         {
-            if (clip.name == "AttackAnim1" || clip.name == "Wizard_AttackAnim")
+            if (clip.name == "AttackAnim1" || clip.name == "Wizard_AttackAnim" || clip.name == "Warrior_Attack")
             {
                 return clip.length;
             }
