@@ -297,7 +297,14 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      crouch_attacks_0: 5515247173311700785
+      crouch_attacks_1: -4572076308115362940
+      crouch_attacks_2: -1006885749875651793
+      crouch_attacks_3: 3888701059537634496
+      crouch_attacks_4: -9115036747040266995
+      crouch_attacks_5: -7784815003266371253
+      crouch_attacks_6: -5184701433095755370
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
