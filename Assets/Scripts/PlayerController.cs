@@ -4,12 +4,14 @@ public class PlayerController : MonoBehaviour
 {
     public float speed = 5f;
     public float jumpForce = 12f;
+    public float attackRange = 1.5f;
     private Animator animator;
     private Rigidbody2D rb;
     private Vector2 movement;
     private bool facingRight = true;
     private bool isGrounded = true;
     private bool isAttacking = false;
+    public Transform bot;
 
     void Start()
     {
@@ -77,6 +79,17 @@ public class PlayerController : MonoBehaviour
 
     void ResetAttack()
     {
+        // Oyuncuya mesafe kontrolü
+        float distanceToBot = Vector2.Distance(transform.position, bot.position);
+        if (distanceToBot <= attackRange)
+        {
+            HealthManager botHealth = bot.GetComponent<HealthManager>();
+            if (botHealth != null)
+            {
+                botHealth.TakeDamage(20); // Örnek hasar
+            }
+        }
+
         isAttacking = false;
         animator.SetBool("isAttacking", false);
     }
