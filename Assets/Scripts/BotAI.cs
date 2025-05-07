@@ -1,11 +1,12 @@
 using UnityEngine;
 using System.Collections;
+using TMPro;
 
 public class BotAI : MonoBehaviour
 {
     public Transform player;
     public float moveSpeed = 3f;
-    public float attackRange = 1.5f;
+    public float attackRange = 3f;
     public float chaseRange = 6f;
     public float attackDelay = 2f;
     public float decisionInterval = 1.5f;
@@ -19,16 +20,17 @@ public class BotAI : MonoBehaviour
 
     private enum BotState { Idle, Chase, Attack, Retreat }
     private BotState currentState = BotState.Idle;
+    public GameObject damageText;
 
     private void Start()
     {
         animator = GetComponent<Animator>();
         decisionTimer = decisionInterval;
 
-        // Eðer bu bot bir büyücü ise (Wizard_Player), menzil daha fazla olsun
+        // Eï¿½er bu bot bir bï¿½yï¿½cï¿½ ise (Wizard_Player), menzil daha fazla olsun
         if (gameObject.name.Contains("Wizard_Player"))
         {
-            attackRange = 3f;   // normalde 1.5f idi
+            attackRange = 6f;   // normalde 3f idi
             chaseRange = 8f;    // normalde 6f idi
         }
     }
@@ -37,7 +39,7 @@ public class BotAI : MonoBehaviour
     {
         float distance = Vector2.Distance(transform.position, player.position);
 
-        // Karar verme süresi dolunca yeni davranýþ belirle
+        // Karar verme sï¿½resi dolunca yeni davranï¿½ï¿½ belirle
         decisionTimer -= Time.deltaTime;
         if (decisionTimer <= 0f && !isAttacking)
         {
@@ -112,7 +114,7 @@ public class BotAI : MonoBehaviour
     {
         Vector2 dir = (player.position - transform.position).normalized * directionMultiplier;
 
-        // Yakýnsa yavaþlat
+        // Yakï¿½nsa yavaï¿½lat
         float slowDownFactor = Mathf.Clamp01(Vector2.Distance(transform.position, player.position) / chaseRange);
         Vector2 movement = dir * moveSpeed * slowDownFactor;
 
@@ -129,7 +131,7 @@ public class BotAI : MonoBehaviour
     private float GetAttackAnimationLength(string animName)
     {
         if (animator == null || animator.runtimeAnimatorController == null)
-            return 0.6f; // Varsayýlan
+            return 0.6f; // Varsayï¿½lan
 
         foreach (AnimationClip clip in animator.runtimeAnimatorController.animationClips)
         {
@@ -137,7 +139,7 @@ public class BotAI : MonoBehaviour
                 return clip.length;
         }
 
-        return 0.6f; // Animasyon bulunamazsa varsayýlan
+        return 0.6f; // Animasyon bulunamazsa varsayï¿½lan
     }
 
     private IEnumerator AttackRoutine()
@@ -147,7 +149,7 @@ public class BotAI : MonoBehaviour
         animator.SetFloat("Speed", 0);
 
         float animDuration = GetAttackAnimationLength("Wizard_AttackAnim");
-        float impactTime = animDuration * 0.4f; // Darbenin ortasý gibi bir zamanlama
+        float impactTime = animDuration * 0.4f; // Darbenin ortasï¿½ gibi bir zamanlama
 
         yield return new WaitForSeconds(impactTime);
 
@@ -158,6 +160,25 @@ public class BotAI : MonoBehaviour
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(20);
+
+                // Hasar yazÄ±sÄ±
+                GameObject textObj = Instantiate(damageText, player.position + Vector3.up * 1.5f, Quaternion.identity);
+                TextMeshProUGUI text = textObj.GetComponentInChildren<TextMeshProUGUI>();
+                if (text != null)
+                {
+                    text.text = "-20";
+                }
+                Destroy(textObj, 1f);
+
+                // Oyuncunun canÄ±nÄ± kontrol et
+                if (playerHealth.currentHealth <= 0)
+                {
+                    Animator playerAnimator = player.GetComponent<Animator>();
+                    if (playerAnimator != null)
+                    {
+                        playerAnimator.SetTrigger("DeathAnim");
+                    }
+                }
             }
         }
 

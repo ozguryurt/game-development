@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = true;
     private bool isAttacking = false;
     public Transform bot;
+    public GameObject damageText;
 
     void Start()
     {
@@ -32,9 +34,16 @@ public class PlayerController : MonoBehaviour
         }
 
         // Zıplama (sadece yere değdiğinde)
-        if (Input.GetKeyDown(KeyCode.W) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.W))
         {
-            Jump();
+            if (isGrounded)
+            {
+                Jump();
+            }
+            else if (!isGrounded)
+            {
+                JumpNinja();
+            }
         }
 
         // Saldırı (sadece yere değdiğinde çalışsın)
@@ -63,6 +72,14 @@ public class PlayerController : MonoBehaviour
         isGrounded = false;
     }
 
+    void JumpNinja()
+    {
+        // Burada JumpWarrior fonksiyonunun içeriği olacak
+        animator.SetBool("isJumping", true);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce * 1.5f); // Normal zıplamadan biraz daha güçlü yapabiliriz
+        isGrounded = false;
+    }
+
     void Attack()
     {
         if(!isAttacking) {
@@ -86,7 +103,26 @@ public class PlayerController : MonoBehaviour
             HealthManager botHealth = bot.GetComponent<HealthManager>();
             if (botHealth != null)
             {
-                botHealth.TakeDamage(20); // Örnek hasar
+                botHealth.TakeDamage(20);
+
+                // Hasar yazısı
+                GameObject textObj = Instantiate(damageText, bot.position + Vector3.up * 1.5f, Quaternion.identity);
+                TextMeshProUGUI text = textObj.GetComponentInChildren<TextMeshProUGUI>();
+                if (text != null)
+                {
+                    text.text = "-20";
+                }
+                Destroy(textObj, 1f);
+
+                // Botun canını kontrol et
+                if (botHealth.currentHealth <= 0)
+                {
+                    Animator botAnimator = bot.GetComponent<Animator>();
+                    if (botAnimator != null)
+                    {
+                        botAnimator.SetTrigger("Wizard_DeathAnim");
+                    }
+                }
             }
         }
 
