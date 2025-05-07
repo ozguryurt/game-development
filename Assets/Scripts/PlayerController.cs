@@ -14,17 +14,21 @@ public class PlayerController : MonoBehaviour
     private bool isAttacking = false;
     public Transform bot;
     public GameObject damageText;
+    private HealthManager playerHealth;
 
     void Start()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        playerHealth = GetComponent<HealthManager>();
     }
 
     void Update()
     {
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
+
+        Debug.Log("Oyuncu canı: " + playerHealth);
 
         // Hareket animasyonu sadece saldırı yokken güncellensin
         if (!isAttacking)
