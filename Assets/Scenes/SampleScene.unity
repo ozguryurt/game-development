@@ -345,7 +345,7 @@ GameObject:
   - component: {fileID: 163337182}
   m_Layer: 0
   m_Name: Wizard_Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -771,6 +771,8 @@ GameObject:
   m_Component:
   - component: {fileID: 559296755}
   - component: {fileID: 559296754}
+  - component: {fileID: 559296757}
+  - component: {fileID: 559296756}
   m_Layer: 0
   m_Name: Health_Potion
   m_TagString: Untagged
@@ -841,13 +843,43 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 559296753}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.35, y: -3.61, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -241.54999, y: -6.0099945, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &559296756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 559296753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c98f70dc5cb88bb4293d5a015dd22500, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healAmount: 20
+--- !u!114 &559296757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 559296753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db9e206ba7238144483442ee8237f28d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthPotionInScene: {fileID: 559296753}
+  spawnInterval: 5
+  minX: -8
+  maxX: 8
+  groundY: -3.5
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -1581,7 +1613,7 @@ GameObject:
   - component: {fileID: 1049486950}
   m_Layer: 0
   m_Name: Ninja_Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2151,7 +2183,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 150.88269, y: -53.38568}
+  m_AnchoredPosition: {x: 150.88269, y: -53.385742}
   m_SizeDelta: {x: 179.3199, y: 31.98471}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2015693840
@@ -2286,7 +2318,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -142, y: -53.38568}
+  m_AnchoredPosition: {x: -142, y: -53.385742}
   m_SizeDelta: {x: 179.31995, y: 31.98471}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2030592383
