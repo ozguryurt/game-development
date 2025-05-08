@@ -18,6 +18,13 @@ public class HealthManager : MonoBehaviour
 
     }
 
+    public void Heal(int amount) {
+        currentHealth += amount;
+        if (currentHealth > maxHealth)
+            currentHealth = maxHealth;
+        healthbar.SetCurrentHealth(currentHealth);
+    }
+
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;

@@ -1,5 +1,7 @@
 using UnityEngine;
+using System.Collections;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -15,6 +17,10 @@ public class PlayerController : MonoBehaviour
     public Transform bot;
     public GameObject damageText;
     private HealthManager playerHealth;
+    private bool isDead = false;
+    private float lastNinjaJumpTime = 0f;
+    private int ninjaJumpCount = 0;
+    private const int MAX_NINJA_JUMPS = 1;
 
     void Start()
     {
@@ -27,8 +33,6 @@ public class PlayerController : MonoBehaviour
     {
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
-
-        Debug.Log("Oyuncu canı: " + playerHealth);
 
         // Hareket animasyonu sadece saldırı yokken güncellensin
         if (!isAttacking)
@@ -43,8 +47,9 @@ public class PlayerController : MonoBehaviour
             if (isGrounded)
             {
                 Jump();
+                ninjaJumpCount = 0; // Yere değdiğinde zıplayış sayısını sıfırla
             }
-            else if (!isGrounded)
+            else if (!isGrounded && ninjaJumpCount < MAX_NINJA_JUMPS && Time.time - lastNinjaJumpTime >= 5f)
             {
                 JumpNinja();
             }
@@ -61,6 +66,30 @@ public class PlayerController : MonoBehaviour
         {
             Flip();
         }
+
+        // Oyuncu canını kontrol et
+        if(playerHealth.currentHealth <= 0 && !isDead)
+        {
+            isDead = true;
+            animator.SetTrigger("DeathAnim");
+            StartCoroutine(DeathSequence());
+        }
+    }
+    private IEnumerator DeathSequence()
+    {
+        //yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
+        //Debug.Log("Kaybettiniz!");
+
+        // Aktif animasyon klibini al
+        AnimatorClipInfo[] clips = animator.GetCurrentAnimatorClipInfo(0);
+        float deathAnimDuration = clips[0].clip.length;
+
+        // Animasyon süresi kadar bekle
+        yield return new WaitForSeconds(deathAnimDuration);
+
+        // Sahneyi yükle
+        GameResult.playerWon = false;
+        SceneManager.LoadScene("EndGameScene");
     }
 
     void FixedUpdate()
@@ -78,9 +107,10 @@ public class PlayerController : MonoBehaviour
 
     void JumpNinja()
     {
-        // Burada JumpWarrior fonksiyonunun içeriği olacak
+        lastNinjaJumpTime = Time.time;
+        ninjaJumpCount++;
         animator.SetBool("isJumping", true);
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce * 1.5f); // Normal zıplamadan biraz daha güçlü yapabiliriz
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce * 1.5f);
         isGrounded = false;
     }
 
@@ -115,18 +145,9 @@ public class PlayerController : MonoBehaviour
                 if (text != null)
                 {
                     text.text = "-20";
+                    text.color = Color.red;
                 }
                 Destroy(textObj, 1f);
-
-                // Botun canını kontrol et
-                if (botHealth.currentHealth <= 0)
-                {
-                    Animator botAnimator = bot.GetComponent<Animator>();
-                    if (botAnimator != null)
-                    {
-                        botAnimator.SetTrigger("Wizard_DeathAnim");
-                    }
-                }
             }
         }
 
@@ -162,6 +183,7 @@ public class PlayerController : MonoBehaviour
         {
             isGrounded = true;
             animator.SetBool("isJumping", false);
+            ninjaJumpCount = 0; // Yere değdiğinde zıplayış sayısını sıfırla
         }
     }
 }
