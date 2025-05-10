@@ -8,7 +8,8 @@ public class EndGameMenuController : MonoBehaviour
     public TextMeshProUGUI resultText;
     public TextMeshProUGUI resultTextShadow;
 
-    void Start() {
+    void Start()
+    {
         if (resultText != null)
         {
             resultText.text = GameResult.playerWon ? "KAZANDIN!" : "KAYBETTIN!";
@@ -19,6 +20,6 @@ public class EndGameMenuController : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("MainMenu");
     }
 }

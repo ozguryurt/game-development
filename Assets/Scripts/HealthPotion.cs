@@ -4,21 +4,27 @@ using TMPro;
 public class HealthPotion : MonoBehaviour
 {
     public int healAmount = 20;
-    public float destroyDelay = 2f;
     private Rigidbody2D rb;
 
     public float minX = -10f;
     public float maxX = 10f;
-    public float spawnHeight = 2f;
+    public float spawnHeight = -0.5f;
     
     public GameObject healText;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.gravityScale = 0.5f; // Yerçekimi etkisini azalt
+            rb.linearDamping = 1f; // Hava direncini artır
+        }
         InvokeRepeating("Respawn", 10f, 10f);
     }
 
     void Respawn() {
+        Debug.Log("HealthPotion Respawn");
         float randomX = Random.Range(minX, maxX);
         transform.position = new Vector3(randomX, spawnHeight, 0f);
     }

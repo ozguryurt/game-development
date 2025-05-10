@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class PlayerController : MonoBehaviour
 {
     public float speed = 5f;
-    public float jumpForce = 12f;
+    public float jumpForce = 5f;
     public float attackRange = 1.5f;
     private Animator animator;
     private Rigidbody2D rb;
