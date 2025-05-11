@@ -9,6 +9,25 @@ public class GameManager : MonoBehaviour
     public HealthBar botHealthBar;
 
     public GameObject damageText;
+    public GameObject wizardProjectile;
+
+    public AudioClip backgroundMusic;
+    private AudioSource audioSource;
+
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+
+        if (backgroundMusic != null)
+        {
+            audioSource.clip = backgroundMusic;
+            audioSource.loop = true;
+            audioSource.playOnAwake = false;
+            audioSource.Play();
+        }
+
+        DontDestroyOnLoad(gameObject);
+    }
 
     void Start()
     {
@@ -43,5 +62,8 @@ public class GameManager : MonoBehaviour
         // Hasar yazısını ayarlama
         player.GetComponent<PlayerController>().damageText = damageText;
         bot.GetComponent<BotAI>().damageText = damageText;
+
+        // Wizard projectile prefab'ini atama
+        player.GetComponent<PlayerController>().wizardProjectilePrefab = wizardProjectile;
     }
 }

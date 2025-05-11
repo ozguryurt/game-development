@@ -71,7 +71,7 @@ public class BotAI : MonoBehaviour
         if (botHealth.currentHealth <= 0 && !isDead)
         {
             isDead = true;
-            animator.SetTrigger("Wizard_DeathAnim");
+            animator.SetTrigger("DeathAnim");
             StartCoroutine(DeathSequence());
         }
     }
@@ -233,7 +233,7 @@ public class BotAI : MonoBehaviour
         float deathAnimDuration = clips[0].clip.length;
 
         // Animasyon süresi kadar bekle
-        yield return new WaitForSeconds(deathAnimDuration);
+        yield return new WaitForSeconds(deathAnimDuration + 1f);
 
         // Sahneyi yükle
         GameResult.playerWon = true;

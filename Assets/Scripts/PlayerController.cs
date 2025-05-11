@@ -8,19 +8,22 @@ public class PlayerController : MonoBehaviour
     public float speed = 5f;
     public float jumpForce = 5f;
     public float attackRange = 1.5f;
+    public Transform bot;
+    public GameObject damageText;
+
     private Animator animator;
     private Rigidbody2D rb;
     private Vector2 movement;
     private bool facingRight = true;
     private bool isGrounded = true;
     private bool isAttacking = false;
-    public Transform bot;
-    public GameObject damageText;
     private HealthManager playerHealth;
     private bool isDead = false;
     private float lastNinjaJumpTime = 0f;
     private int ninjaJumpCount = 0;
     private const int MAX_NINJA_JUMPS = 1;
+
+    public GameObject wizardProjectilePrefab;
 
     void Start()
     {
@@ -85,7 +88,7 @@ public class PlayerController : MonoBehaviour
         float deathAnimDuration = clips[0].clip.length;
 
         // Animasyon süresi kadar bekle
-        yield return new WaitForSeconds(deathAnimDuration);
+        yield return new WaitForSeconds(deathAnimDuration + 1f);
 
         // Sahneyi yükle
         GameResult.playerWon = false;
@@ -116,16 +119,44 @@ public class PlayerController : MonoBehaviour
 
     void Attack()
     {
-        if(!isAttacking) {
-            isAttacking = true;
-            animator.SetBool("isAttacking", true);
+        if (isAttacking) return;
 
-            // AttackAnim1 animasyon süresini al
-            float attackDuration = GetAttackAnimationLength();
-            
-            // Saldırı bitince durumu sıfırla
-            Invoke("ResetAttack", attackDuration);
+        string selected = CharacterSelection.Instance.selectedCharacter;
+        if (selected == "Wizard_Player" && wizardProjectilePrefab != null)
+        {
+            if(!isAttacking) {
+                isAttacking = true;
+                animator.SetBool("isAttacking", true);
+
+                float attackDuration = GetAttackAnimationLength();
+                Invoke("ResetWizardAttack", attackDuration);
+
+                Invoke("SpawnProjectile", 0.5f);
+            }
+        } else {
+            if(!isAttacking) {
+                isAttacking = true;
+                animator.SetBool("isAttacking", true);
+                float attackDuration = GetAttackAnimationLength();
+                Invoke("ResetAttack", attackDuration);
+            }
         }
+    }
+
+    void SpawnProjectile()
+    {
+        float direction = transform.localScale.x > 0 ? 1f : -1f;
+        Vector3 spawnOffset = new Vector3(direction * 0.75f, 0.5f, 0f);
+        Vector3 spawnPos = transform.position + spawnOffset;
+
+        GameObject projectile = Instantiate(wizardProjectilePrefab, spawnPos, Quaternion.identity);
+        projectile.GetComponent<WizardProjectile>().Initialize(direction);
+    }
+
+    void ResetWizardAttack()
+    {
+        isAttacking = false;
+        animator.SetBool("isAttacking", false);
     }
 
     void ResetAttack()
@@ -161,7 +192,7 @@ public class PlayerController : MonoBehaviour
         AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
         foreach (AnimationClip clip in clips)
         {
-            if (clip.name == "AttackAnim1" || clip.name == "Wizard_AttackAnim" || clip.name == "Warrior_Attack")
+            if (clip.name == "AttackAnim1" || clip.name == "Wizard_AttackAnim" || clip.name == "Warrior_Attack1")
             {
                 return clip.length;
             }
