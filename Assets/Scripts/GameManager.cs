@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject damageText;
     public GameObject wizardProjectile;
+    public GameObject wizardStunObj;
 
     void Start()
     {
@@ -26,6 +27,7 @@ public class GameManager : MonoBehaviour
         // Bot karakterini rastgele seç (seçileni çıkar)
         string[] botCandidates = System.Array.FindAll(allCharacters, c => c != selected);
         string botCharacter = botCandidates[Random.Range(0, botCandidates.Length)];
+        CharacterSelection.Instance.botCharacter = botCharacter;
 
         // Botu sahneye yerleştir
         GameObject botPrefab = Resources.Load<GameObject>("Characters/" + botCharacter);
@@ -47,5 +49,10 @@ public class GameManager : MonoBehaviour
 
         // Wizard projectile prefab'ini atama
         player.GetComponent<PlayerController>().wizardProjectilePrefab = wizardProjectile;
+        bot.GetComponent<BotAI>().wizardProjectilePrefab = wizardProjectile;
+
+        // Wizard stun object prefab'ini atama
+        player.GetComponent<PlayerController>().wizardStunObjectPrefab = wizardStunObj;
+        bot.GetComponent<BotAI>().wizardStunObjectPrefab = wizardStunObj;
     }
 }

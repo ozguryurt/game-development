@@ -16,46 +16,55 @@ public class PlayerController : MonoBehaviour
     private Vector2 movement;
     private bool facingRight = true;
     private bool isGrounded = true;
-    private bool isAttacking = false;
+    public bool isAttacking = false;
     private HealthManager playerHealth;
     private bool isDead = false;
-    private float lastNinjaJumpTime = 0f;
-    private int ninjaJumpCount = 0;
-    private const int MAX_NINJA_JUMPS = 1;
+    private SpriteRenderer spriteRenderer;
 
     public GameObject wizardProjectilePrefab;
+    public GameObject wizardStunObjectPrefab;
+
+    public float dashSpeed = 10f;
+    public float dashDuration = 0.5f;
+    private bool isDashing = false;
+    private float dashTimeLeft;
+
+    public bool isStunning = false;
+    public bool isStunned = false;
+    public bool isDefending = false;
 
     void Start()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         playerHealth = GetComponent<HealthManager>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
     {
+        if (isDead) return;
+
+        if (isStunned)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        // Hareket animasyonu sadece saldırı yokken güncellensin
-        if (!isAttacking)
+        // Hareket animasyonu sadece saldırı ve savunma yokken güncellensin
+        if (!isAttacking && !isDefending)
         {
             animator.SetFloat("Speed", Mathf.Abs(movement.x));
             animator.SetFloat("VerticalSpeed", Mathf.Abs(movement.y));
         }
 
         // Zıplama (sadece yere değdiğinde)
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.W) && isGrounded)
         {
-            if (isGrounded)
-            {
-                Jump();
-                ninjaJumpCount = 0; // Yere değdiğinde zıplayış sayısını sıfırla
-            }
-            else if (!isGrounded && ninjaJumpCount < MAX_NINJA_JUMPS && Time.time - lastNinjaJumpTime >= 5f)
-            {
-                JumpNinja();
-            }
+            Jump();
         }
 
         // Saldırı (sadece yere değdiğinde çalışsın)
@@ -77,7 +86,31 @@ public class PlayerController : MonoBehaviour
             animator.SetTrigger("DeathAnim");
             StartCoroutine(DeathSequence());
         }
+
+        // Dash, Stun ve Savunma mekanizmaları
+        if (CharacterSelection.Instance.selectedCharacter == "Ninja_Player" && Input.GetKeyDown(KeyCode.X) && isGrounded && !isDashing)
+        {
+            StartDash();
+        }
+        else if (CharacterSelection.Instance.selectedCharacter == "Wizard_Player" && Input.GetKeyDown(KeyCode.X))
+        {
+            StartStun();
+        }
+        else if (CharacterSelection.Instance.selectedCharacter == "Warrior_Player" && Input.GetKeyDown(KeyCode.X))
+        {
+            StartDefense();
+        }
+
+        if (isDashing)
+        {
+            dashTimeLeft -= Time.deltaTime;
+            if (dashTimeLeft <= 0)
+            {
+                EndDash();
+            }
+        }
     }
+
     private IEnumerator DeathSequence()
     {
         //yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
@@ -97,23 +130,23 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Saldırı sırasında bile karakter hareket edebilsin
-        rb.linearVelocity = new Vector2(movement.x * speed, rb.linearVelocity.y);
+        if (isStunned)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
+        // Dash sırasında normal hareketi devre dışı bırak
+        if (!isDashing)
+        {
+            rb.linearVelocity = new Vector2(movement.x * speed, rb.linearVelocity.y);
+        }
     }
 
     void Jump()
     {
         animator.SetBool("isJumping", true);
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        isGrounded = false;
-    }
-
-    void JumpNinja()
-    {
-        lastNinjaJumpTime = Time.time;
-        ninjaJumpCount++;
-        animator.SetBool("isJumping", true);
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce * 1.5f);
         isGrounded = false;
     }
 
@@ -165,20 +198,31 @@ public class PlayerController : MonoBehaviour
         float distanceToBot = Vector2.Distance(transform.position, bot.position);
         if (distanceToBot <= attackRange)
         {
-            HealthManager botHealth = bot.GetComponent<HealthManager>();
-            if (botHealth != null)
-            {
-                botHealth.TakeDamage(20);
-
-                // Hasar yazısı
+            if(bot.GetComponent<BotAI>().isDefending) {
                 GameObject textObj = Instantiate(damageText, bot.position + Vector3.up * 1.5f, Quaternion.identity);
                 TextMeshProUGUI text = textObj.GetComponentInChildren<TextMeshProUGUI>();
                 if (text != null)
                 {
-                    text.text = "-20";
+                    text.text = "Blocked";
                     text.color = Color.red;
                 }
                 Destroy(textObj, 1f);
+            } else {
+                HealthManager botHealth = bot.GetComponent<HealthManager>();
+                if (botHealth != null)
+                {
+                    botHealth.TakeDamage(20);
+
+                    // Hasar yazısı
+                    GameObject textObj = Instantiate(damageText, bot.position + Vector3.up * 1.5f, Quaternion.identity);
+                    TextMeshProUGUI text = textObj.GetComponentInChildren<TextMeshProUGUI>();
+                    if (text != null)
+                    {
+                        text.text = "-20";
+                        text.color = Color.red;
+                    }
+                    Destroy(textObj, 1f);
+                }
             }
         }
 
@@ -214,7 +258,138 @@ public class PlayerController : MonoBehaviour
         {
             isGrounded = true;
             animator.SetBool("isJumping", false);
-            ninjaJumpCount = 0; // Yere değdiğinde zıplayış sayısını sıfırla
         }
+    }
+
+    void StartDash()
+    {
+        isDashing = true;
+        dashTimeLeft = dashDuration;
+        rb.linearVelocity = new Vector2((facingRight ? 1 : -1) * dashSpeed, rb.linearVelocity.y);
+        rb.gravityScale = 0f; // Dash sırasında yerçekimini devre dışı bırak
+        
+        // Dash efektleri
+        Color dashColor = spriteRenderer.color;
+        dashColor.a = 0.5f; // Yarı şeffaf
+        spriteRenderer.color = dashColor;
+
+        // Collision'ları devre dışı bırak
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Discrete;
+        GetComponent<Collider2D>().isTrigger = true;
+    }
+
+    void EndDash()
+    {
+        isDashing = false;
+        rb.gravityScale = 1f; // Yerçekimini geri aç
+        rb.linearVelocity = new Vector2(movement.x * speed, rb.linearVelocity.y); // Normal hıza dön
+        
+        // Dash efektlerini geri al
+        Color normalColor = spriteRenderer.color;
+        normalColor.a = 1f; // Tam opak
+        spriteRenderer.color = normalColor;
+
+        // Collision'ları geri aç
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        GetComponent<Collider2D>().isTrigger = false;
+    }
+
+    void StartStun()
+    {
+        if (isStunning) return;
+
+        float distanceToBot = Vector2.Distance(transform.position, bot.position);
+        if (distanceToBot <= 10f)
+        {
+            isStunning = true;
+            
+            GameObject stunObject = Instantiate(wizardStunObjectPrefab, bot.position, Quaternion.identity);
+            
+            BotAI botAI = bot.GetComponent<BotAI>();
+            if (botAI != null)
+            {
+                float stunDuration = 2f; // Varsayılan süre
+                Animator stunAnimator = stunObject.GetComponent<Animator>();
+                if (stunAnimator != null)
+                {
+                    AnimationClip[] clips = stunAnimator.runtimeAnimatorController.animationClips;
+                    foreach (AnimationClip clip in clips)
+                    {
+                        if (clip.name == "Wizard_StunAnim")
+                        {
+                            stunDuration = clip.length;
+                            break;
+                        }
+                    }
+                }
+
+                botAI.ApplyStun(stunDuration);
+                Destroy(stunObject, stunDuration);
+                StartCoroutine(ResetStunFlag(stunDuration));
+            }
+        }
+    }
+
+    private IEnumerator ResetStunFlag(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        isStunning = false;
+    }
+
+    public void ApplyStun(float duration)
+    {
+        if (!isStunned)
+        {
+            isStunned = true;
+            rb.linearVelocity = Vector2.zero;
+            StartCoroutine(EndStun(duration));
+        }
+    }
+
+    private IEnumerator EndStun(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        isStunned = false;
+    }
+
+    void StartDefense()
+    {
+        Debug.Log("StartDefense");
+        if (isDefending) return;
+
+        isDefending = true;
+        animator.SetBool("isDefending", true);
+        animator.SetFloat("Speed", 0); // Hareket animasyonunu durdur
+
+        // Animasyon süresi kadar bekle ve savunmayı bitir
+        float defenseDuration = GetDefenseAnimationLength();
+        Invoke("EndDefense", defenseDuration);
+    }
+
+    void EndDefense()
+    {
+        Debug.Log("EndDefense");
+        if (!isDefending) return;
+
+        isDefending = false;
+        animator.SetBool("isDefending", false);
+        
+        // Normal hareket animasyonuna geri dön
+        animator.SetFloat("Speed", Mathf.Abs(movement.x));
+    }
+
+    float GetDefenseAnimationLength()
+    {
+        // Animator içindeki Warrior_Defense animasyonunun süresini al
+        AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
+        foreach (AnimationClip clip in clips)
+        {
+            if (clip.name == "Warrior_Defense")
+            {
+                Debug.Log("GetDefenseAnimationLength");
+                return clip.length;
+            }
+        }
+        return 1f; // Eğer animasyon bulunamazsa varsayılan süre
     }
 }

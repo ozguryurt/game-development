@@ -5,6 +5,7 @@ public class CharacterSelection : MonoBehaviour
     public static CharacterSelection Instance;
 
     public string selectedCharacter; // örn: "Ninja_Player"
+    public string botCharacter;
     
     void Awake()
     {
