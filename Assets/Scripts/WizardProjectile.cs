@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using TMPro;
 
 public class WizardProjectile : MonoBehaviour
@@ -54,8 +55,16 @@ public class WizardProjectile : MonoBehaviour
     {
         if (explosionEffect != null)
         {
-            Instantiate(explosionEffect, transform.position, Quaternion.identity);
+            GameObject explosion = Instantiate(explosionEffect, transform.position, Quaternion.identity);
+            StartCoroutine(MoveExplosionAfterDelay(explosion, 1f));
         }
+
         Destroy(gameObject);
+    }
+
+    IEnumerator MoveExplosionAfterDelay(GameObject explosion, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        explosion.transform.position = new Vector3(-10f, -7f, 0f);
     }
 }

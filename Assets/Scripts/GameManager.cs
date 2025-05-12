@@ -11,24 +11,6 @@ public class GameManager : MonoBehaviour
     public GameObject damageText;
     public GameObject wizardProjectile;
 
-    public AudioClip backgroundMusic;
-    private AudioSource audioSource;
-
-    void Awake()
-    {
-        audioSource = GetComponent<AudioSource>();
-
-        if (backgroundMusic != null)
-        {
-            audioSource.clip = backgroundMusic;
-            audioSource.loop = true;
-            audioSource.playOnAwake = false;
-            audioSource.Play();
-        }
-
-        DontDestroyOnLoad(gameObject);
-    }
-
     void Start()
     {
         // Seçilen karakteri al
