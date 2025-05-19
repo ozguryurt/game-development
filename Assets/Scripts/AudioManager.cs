@@ -6,7 +6,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] AudioSource musicSource;
     [SerializeField] AudioSource SFXSource;
 
-    [Header("-------Background Music--------")]
+    [Header("-------SFX S--------")]
     public AudioClip background;
     public AudioClip wizardDeath;
     public AudioClip warriorDeath;
@@ -19,12 +19,6 @@ public class AudioManager : MonoBehaviour
     public AudioClip warriorAttack;
     public AudioClip ninjaAttack;
     public AudioClip getHealth;
-
-    private void Start()
-    {
-        musicSource.clip = background;
-        musicSource.Play();
-    }
 
     public void PlaySFX(AudioClip clip)
     {

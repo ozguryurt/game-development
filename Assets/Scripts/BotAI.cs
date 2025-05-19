@@ -49,6 +49,13 @@ public class BotAI : MonoBehaviour
     private bool isDead = false;
     private Rigidbody2D rb;
 
+    AudioManager audioManager;
+
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
+
     private void Start()
     {
         animator = GetComponent<Animator>();
@@ -178,7 +185,22 @@ public class BotAI : MonoBehaviour
         {
             if (Time.time - lastAttackTime >= attackDelay)
             {
+
                 currentState = BotState.Attack;
+                string selectedCharacter = CharacterSelection.Instance.selectedCharacter;
+
+                if (selectedCharacter == "Wizard_Player")
+                {
+                    audioManager.PlaySFX(audioManager.wizardAttack);
+                }
+                else if (selectedCharacter == "Ninja_Player")
+                {
+                    audioManager.PlaySFX(audioManager.ninjaAttack);
+                }
+                else if (selectedCharacter == "Warrior_Player")
+                {
+                    audioManager.PlaySFX(audioManager.warriorAttack);
+                }
             }
             else
             {
@@ -346,7 +368,7 @@ public class BotAI : MonoBehaviour
         // Aktif animasyon klibini al
         AnimatorClipInfo[] clips = animator.GetCurrentAnimatorClipInfo(0);
         float deathAnimDuration = clips[0].clip.length;
-
+        audioManager.PlaySFX(audioManager.ninjaDeath);
         // Animasyon süresi kadar bekle
         yield return new WaitForSeconds(deathAnimDuration + 1f);
 
@@ -371,6 +393,7 @@ public class BotAI : MonoBehaviour
 
     private void Flip()
     {
+        audioManager.PlaySFX(audioManager.walk);
         facingRight = !facingRight;
         Vector3 newScale = transform.localScale;
         newScale.x *= -1;
@@ -428,6 +451,7 @@ public class BotAI : MonoBehaviour
         {
             rb.linearVelocity = new Vector2((facingRight ? 1 : -1) * dashSpeed, rb.linearVelocity.y);
             rb.gravityScale = 0f;
+            audioManager.PlaySFX(audioManager.dash);
             if (col != null)
             {
                 col.isTrigger = true;
@@ -500,6 +524,7 @@ public class BotAI : MonoBehaviour
         isDefending = true;
         animator.SetBool("isDefending", true);
         animator.SetFloat("Speed", 0);
+        audioManager.PlaySFX(audioManager.defence);
 
         // Animasyon süresi kadar bekle ve savunmayı bitir
         float defenseDuration = GetDefenseAnimationLength();
