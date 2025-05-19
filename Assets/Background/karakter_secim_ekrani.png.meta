@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      karakter_secim_ekrani_0: 6203023381648682035
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

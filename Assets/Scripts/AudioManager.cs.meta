@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: 1245c4fd0df4441428047276ba52ee90
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - musicSource: {instanceID: 0}
+  - SFXSource: {instanceID: 0}
+  - background: {instanceID: 0}
+  - wizardDeath: {instanceID: 0}
+  - warriorDeath: {instanceID: 0}
+  - ninjaDeath: {instanceID: 0}
+  - walk: {instanceID: 0}
+  - defence: {instanceID: 0}
+  - dash: {instanceID: 0}
+  - jump: {instanceID: 0}
+  - wizardAttack: {instanceID: 0}
+  - warriorAttack: {instanceID: 0}
+  - ninjaAttack: {instanceID: 0}
+  - getHealth: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -24,6 +24,8 @@ public class PlayerController : MonoBehaviour
     public GameObject wizardProjectilePrefab;
     public GameObject wizardStunObjectPrefab;
 
+    AudioManager audioManager;
+
     public float dashSpeed = 10f;
     public float dashDuration = 0.5f;
     private bool isDashing = false;
@@ -32,6 +34,11 @@ public class PlayerController : MonoBehaviour
     public bool isStunning = false;
     public bool isStunned = false;
     public bool isDefending = false;
+
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
 
     void Start()
     {
@@ -64,7 +71,9 @@ public class PlayerController : MonoBehaviour
         // Zıplama (sadece yere değdiğinde)
         if (Input.GetKeyDown(KeyCode.W) && isGrounded)
         {
+            audioManager.PlaySFX(audioManager.jump);
             Jump();
+
         }
 
         // Saldırı (sadece yere değdiğinde çalışsın)
@@ -77,6 +86,7 @@ public class PlayerController : MonoBehaviour
         if ((movement.x > 0 && !facingRight) || (movement.x < 0 && facingRight))
         {
             Flip();
+            audioManager.PlaySFX(audioManager.walk);
         }
 
         // Oyuncu canını kontrol et
@@ -85,6 +95,7 @@ public class PlayerController : MonoBehaviour
             isDead = true;
             animator.SetTrigger("DeathAnim");
             StartCoroutine(DeathSequence());
+            audioManager.PlaySFX(audioManager.ninjaDeath);
         }
 
         // Dash, Stun ve Savunma mekanizmaları
@@ -144,7 +155,7 @@ public class PlayerController : MonoBehaviour
     }
 
     void Jump()
-    {
+    {      
         animator.SetBool("isJumping", true);
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         isGrounded = false;
@@ -157,7 +168,9 @@ public class PlayerController : MonoBehaviour
         string selected = CharacterSelection.Instance.selectedCharacter;
         if (selected == "Wizard_Player" && wizardProjectilePrefab != null)
         {
-            if(!isAttacking) {
+            if (!isAttacking)
+            {
+                audioManager.PlaySFX(audioManager.wizardAttack); // Wizard ses efekti
                 isAttacking = true;
                 animator.SetBool("isAttacking", true);
 
@@ -166,8 +179,23 @@ public class PlayerController : MonoBehaviour
 
                 Invoke("SpawnProjectile", 0.5f);
             }
-        } else {
-            if(!isAttacking) {
+        }
+        else if (selected == "Ninja_Player")
+        {
+            if (!isAttacking)
+            {
+                audioManager.PlaySFX(audioManager.ninjaAttack); // Ninja ses efekti
+                isAttacking = true;
+                animator.SetBool("isAttacking", true);
+                float attackDuration = GetAttackAnimationLength();
+                Invoke("ResetAttack", attackDuration);
+            }
+        }
+        else if (selected == "Warrior_Player")
+        {
+            if (!isAttacking)
+            {
+                audioManager.PlaySFX(audioManager.warriorAttack); // Warrior ses efekti
                 isAttacking = true;
                 animator.SetBool("isAttacking", true);
                 float attackDuration = GetAttackAnimationLength();
@@ -267,7 +295,8 @@ public class PlayerController : MonoBehaviour
         dashTimeLeft = dashDuration;
         rb.linearVelocity = new Vector2((facingRight ? 1 : -1) * dashSpeed, rb.linearVelocity.y);
         rb.gravityScale = 0f; // Dash sırasında yerçekimini devre dışı bırak
-        
+        audioManager.PlaySFX(audioManager.dash);
+
         // Dash efektleri
         Color dashColor = spriteRenderer.color;
         dashColor.a = 0.5f; // Yarı şeffaf
@@ -360,7 +389,7 @@ public class PlayerController : MonoBehaviour
         isDefending = true;
         animator.SetBool("isDefending", true);
         animator.SetFloat("Speed", 0); // Hareket animasyonunu durdur
-
+        audioManager.PlaySFX(audioManager.defence);
         // Animasyon süresi kadar bekle ve savunmayı bitir
         float defenseDuration = GetDefenseAnimationLength();
         Invoke("EndDefense", defenseDuration);

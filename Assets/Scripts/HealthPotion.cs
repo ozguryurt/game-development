@@ -12,6 +12,11 @@ public class HealthPotion : MonoBehaviour
     
     public GameObject healText;
 
+    AudioManager audioManager;
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -34,6 +39,7 @@ public class HealthPotion : MonoBehaviour
         if(collision.gameObject.CompareTag("Player")) {
             HealthManager playerHealth = collision.gameObject.GetComponent<HealthManager>();
             playerHealth.Heal(10);
+            audioManager.PlaySFX(audioManager.getHealth);
             // Heal yazısı
             GameObject textObj = Instantiate(healText, collision.transform.position + Vector3.up * 1.5f, Quaternion.identity);
             TextMeshProUGUI text = textObj.GetComponentInChildren<TextMeshProUGUI>();

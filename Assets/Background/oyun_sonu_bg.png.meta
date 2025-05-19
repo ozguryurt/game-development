@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      oyun_sonu_bg_0: -622657264929157449
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
