@@ -54,5 +54,9 @@ public class GameManager : MonoBehaviour
         // Wizard stun object prefab'ini atama
         player.GetComponent<PlayerController>().wizardStunObjectPrefab = wizardStunObj;
         bot.GetComponent<BotAI>().wizardStunObjectPrefab = wizardStunObj;
+
+        // Karakter canlarını fulle
+        player.GetComponent<HealthManager>().Heal(100);
+        bot.GetComponent<HealthManager>().Heal(100);
     }
 }

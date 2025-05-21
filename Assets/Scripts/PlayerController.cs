@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
     private HealthManager playerHealth;
     private bool isDead = false;
     private SpriteRenderer spriteRenderer;
+    private int jumpCount = 0;
+    private int maxJumps = 2;
 
     public GameObject wizardProjectilePrefab;
     public GameObject wizardStunObjectPrefab;
@@ -34,10 +36,15 @@ public class PlayerController : MonoBehaviour
     public bool isStunning = false;
     public bool isStunned = false;
     public bool isDefending = false;
+    public bool isSlowed = false;
+    private float originalSpeed;
+    private float slowEffectDuration = 3f;
+    private float slowEffectMultiplier = 0.5f;
 
     private void Awake()
     {
         audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+        originalSpeed = speed; // Başlangıç hızını kaydet
     }
 
     void Start()
@@ -69,11 +76,9 @@ public class PlayerController : MonoBehaviour
         }
 
         // Zıplama (sadece yere değdiğinde)
-        if (Input.GetKeyDown(KeyCode.W) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.W))
         {
-            audioManager.PlaySFX(audioManager.jump);
             Jump();
-
         }
 
         // Saldırı (sadece yere değdiğinde çalışsın)
@@ -98,14 +103,14 @@ public class PlayerController : MonoBehaviour
             audioManager.PlaySFX(audioManager.ninjaDeath);
         }
 
-        // Dash, Stun ve Savunma mekanizmaları
+        // Dash, Slow ve Savunma mekanizmaları
         if (CharacterSelection.Instance.selectedCharacter == "Ninja_Player" && Input.GetKeyDown(KeyCode.X) && isGrounded && !isDashing)
         {
             StartDash();
         }
         else if (CharacterSelection.Instance.selectedCharacter == "Wizard_Player" && Input.GetKeyDown(KeyCode.X))
         {
-            StartStun();
+            StartSlow();
         }
         else if (CharacterSelection.Instance.selectedCharacter == "Warrior_Player" && Input.GetKeyDown(KeyCode.X))
         {
@@ -156,9 +161,14 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {      
-        animator.SetBool("isJumping", true);
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        isGrounded = false;
+        if (jumpCount < maxJumps)
+        {
+            animator.SetBool("isJumping", true);
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            isGrounded = false;
+            jumpCount++;
+            audioManager.PlaySFX(audioManager.jump);
+        }
     }
 
     void Attack()
@@ -286,6 +296,7 @@ public class PlayerController : MonoBehaviour
         {
             isGrounded = true;
             animator.SetBool("isJumping", false);
+            jumpCount = 0; // Yere değdiğinde zıplama sayacını sıfırla
         }
     }
 
@@ -302,8 +313,7 @@ public class PlayerController : MonoBehaviour
         dashColor.a = 0.5f; // Yarı şeffaf
         spriteRenderer.color = dashColor;
 
-        // Collision'ları devre dışı bırak
-        rb.collisionDetectionMode = CollisionDetectionMode2D.Discrete;
+        // Collision'ları devre dışı bırak ama duvarlarla çarpışmayı koru
         GetComponent<Collider2D>().isTrigger = true;
     }
 
@@ -319,66 +329,16 @@ public class PlayerController : MonoBehaviour
         spriteRenderer.color = normalColor;
 
         // Collision'ları geri aç
-        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         GetComponent<Collider2D>().isTrigger = false;
     }
 
-    void StartStun()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (isStunning) return;
-
-        float distanceToBot = Vector2.Distance(transform.position, bot.position);
-        if (distanceToBot <= 10f)
+        // Dash sırasında duvarlarla çarpışma kontrolü
+        if (isDashing && (collision.gameObject.name == "SagDuvar" || collision.gameObject.name == "SolDuvar"))
         {
-            isStunning = true;
-            
-            GameObject stunObject = Instantiate(wizardStunObjectPrefab, bot.position, Quaternion.identity);
-            
-            BotAI botAI = bot.GetComponent<BotAI>();
-            if (botAI != null)
-            {
-                float stunDuration = 2f; // Varsayılan süre
-                Animator stunAnimator = stunObject.GetComponent<Animator>();
-                if (stunAnimator != null)
-                {
-                    AnimationClip[] clips = stunAnimator.runtimeAnimatorController.animationClips;
-                    foreach (AnimationClip clip in clips)
-                    {
-                        if (clip.name == "Wizard_StunAnim")
-                        {
-                            stunDuration = clip.length;
-                            break;
-                        }
-                    }
-                }
-
-                botAI.ApplyStun(stunDuration);
-                Destroy(stunObject, stunDuration);
-                StartCoroutine(ResetStunFlag(stunDuration));
-            }
+            EndDash();
         }
-    }
-
-    private IEnumerator ResetStunFlag(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        isStunning = false;
-    }
-
-    public void ApplyStun(float duration)
-    {
-        if (!isStunned)
-        {
-            isStunned = true;
-            rb.linearVelocity = Vector2.zero;
-            StartCoroutine(EndStun(duration));
-        }
-    }
-
-    private IEnumerator EndStun(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        isStunned = false;
     }
 
     void StartDefense()
@@ -420,5 +380,64 @@ public class PlayerController : MonoBehaviour
             }
         }
         return 1f; // Eğer animasyon bulunamazsa varsayılan süre
+    }
+
+    void StartSlow()
+    {
+        if (isStunning) return;
+
+        float distanceToBot = Vector2.Distance(transform.position, bot.position);
+        if (distanceToBot <= 10f)
+        {
+            isStunning = true;
+            
+            GameObject stunObject = Instantiate(wizardStunObjectPrefab, bot.position, Quaternion.identity);
+            
+            BotAI botAI = bot.GetComponent<BotAI>();
+            if (botAI != null)
+            {
+                float slowDuration = 3f;
+                Animator stunAnimator = stunObject.GetComponent<Animator>();
+                if (stunAnimator != null)
+                {
+                    AnimationClip[] clips = stunAnimator.runtimeAnimatorController.animationClips;
+                    foreach (AnimationClip clip in clips)
+                    {
+                        if (clip.name == "Wizard_StunAnim")
+                        {
+                            slowDuration = clip.length;
+                            break;
+                        }
+                    }
+                }
+
+                botAI.ApplySlow(slowDuration, slowEffectMultiplier);
+                Destroy(stunObject, slowDuration);
+                StartCoroutine(ResetStunFlag(slowDuration));
+            }
+        }
+    }
+
+    private IEnumerator ResetStunFlag(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        isStunning = false;
+    }
+
+    public void ApplySlow(float duration, float slowMultiplier)
+    {
+        if (!isSlowed)
+        {
+            isSlowed = true;
+            speed = originalSpeed * slowMultiplier;
+            StartCoroutine(EndSlow(duration));
+        }
+    }
+
+    private IEnumerator EndSlow(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        isSlowed = false;
+        speed = originalSpeed;
     }
 }

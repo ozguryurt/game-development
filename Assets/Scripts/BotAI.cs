@@ -13,7 +13,6 @@ public class BotAI : MonoBehaviour
     public float decisionInterval = 0.2f;
     public float retreatDistance = 3f;
     public int attackDamage = 15;
-    public float stunDuration = 0.5f;
     private float lastDefenseTime; // Son savunma zamanını takip etmek için
     private float defenseCooldown = 3f; // Savunma arasındaki bekleme süresi
 
@@ -25,6 +24,9 @@ public class BotAI : MonoBehaviour
     private bool isAttacking = false;
     private bool isStunned = false;
     public bool isDefending = false;
+    private bool isSlowed = false;
+    private float originalMoveSpeed;
+    private float slowEffectMultiplier = 0.5f; // Hızın yarıya düşmesi
     private Animator animator;
     private bool facingRight = true;
     private Vector2 lastKnownPlayerPosition;
@@ -64,6 +66,7 @@ public class BotAI : MonoBehaviour
         decisionTimer = decisionInterval;
         lastKnownPlayerPosition = transform.position;
         rb = GetComponent<Rigidbody2D>();
+        originalMoveSpeed = moveSpeed;
 
         if (gameObject.name.Contains("Wizard_Player"))
         {
@@ -111,7 +114,7 @@ public class BotAI : MonoBehaviour
 
         HandleState(distance);
 
-        // Dash, Stun ve Savunma yeteneklerini kullanma kararı
+        // Dash, Slow ve Savunma yeteneklerini kullanma kararı
         if (CharacterSelection.Instance.botCharacter == "Ninja_Player" && !isDashing && !isStunned)
         {
             // Dash kullanma kararı - cooldown kontrolü ve daha düşük ihtimal
@@ -123,23 +126,23 @@ public class BotAI : MonoBehaviour
         }
         else if (CharacterSelection.Instance.botCharacter == "Wizard_Player" && !isStunned)
         {
-            // Stun kullanma kararı - daha dengeli ve cooldown ile
+            // Slow kullanma kararı - daha dengeli ve cooldown ile
             if (distance <= 10f && Time.time - lastStunTime >= stunCooldown)
             {
-                float stunChance = 0.03f;
+                float slowChance = 0.03f;
                 PlayerController playerController = player.GetComponent<PlayerController>();
                 if (playerController != null && playerController.isAttacking)
                 {
-                    stunChance = 0.08f;
+                    slowChance = 0.08f;
                 }
                 else if (distance <= 5f)
                 {
-                    stunChance = 0.05f;
+                    slowChance = 0.05f;
                 }
 
-                if (Random.value < stunChance)
+                if (Random.value < slowChance)
                 {
-                    StartStun();
+                    StartSlow();
                     lastStunTime = Time.time;
                 }
             }
@@ -430,6 +433,54 @@ public class BotAI : MonoBehaviour
         isStunned = false;
     }
 
+    void StartSlow()
+    {
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        if (distanceToPlayer <= 10f)
+        {
+            GameObject stunObject = Instantiate(wizardStunObjectPrefab, player.position, Quaternion.identity);
+            
+            PlayerController playerController = player.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                float slowDuration = 3f;
+                Animator stunAnimator = stunObject.GetComponent<Animator>();
+                if (stunAnimator != null)
+                {
+                    AnimationClip[] clips = stunAnimator.runtimeAnimatorController.animationClips;
+                    foreach (AnimationClip clip in clips)
+                    {
+                        if (clip.name == "Wizard_StunAnim")
+                        {
+                            slowDuration = clip.length;
+                            break;
+                        }
+                    }
+                }
+
+                playerController.ApplySlow(slowDuration, slowEffectMultiplier);
+                Destroy(stunObject, slowDuration);
+            }
+        }
+    }
+
+    public void ApplySlow(float duration, float slowMultiplier)
+    {
+        if (!isSlowed)
+        {
+            isSlowed = true;
+            moveSpeed = originalMoveSpeed * slowMultiplier;
+            StartCoroutine(EndSlow(duration));
+        }
+    }
+
+    private IEnumerator EndSlow(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        isSlowed = false;
+        moveSpeed = originalMoveSpeed;
+    }
+
     void StartDash()
     {
         if (isDashing || isStunned) return; // Stun durumunda dash atamaz
@@ -486,34 +537,12 @@ public class BotAI : MonoBehaviour
         }
     }
 
-    void StartStun()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-        if (distanceToPlayer <= 10f)
+        // Dash sırasında duvarlarla çarpışma kontrolü
+        if (isDashing && (collision.gameObject.name == "SagDuvar" || collision.gameObject.name == "SolDuvar"))
         {
-            GameObject stunObject = Instantiate(wizardStunObjectPrefab, player.position, Quaternion.identity);
-            
-            PlayerController playerController = player.GetComponent<PlayerController>();
-            if (playerController != null)
-            {
-                float stunDuration = 2f;
-                Animator stunAnimator = stunObject.GetComponent<Animator>();
-                if (stunAnimator != null)
-                {
-                    AnimationClip[] clips = stunAnimator.runtimeAnimatorController.animationClips;
-                    foreach (AnimationClip clip in clips)
-                    {
-                        if (clip.name == "Wizard_StunAnim")
-                        {
-                            stunDuration = clip.length;
-                            break;
-                        }
-                    }
-                }
-
-                playerController.ApplyStun(stunDuration);
-                Destroy(stunObject, stunDuration);
-            }
+            EndDash();
         }
     }
 

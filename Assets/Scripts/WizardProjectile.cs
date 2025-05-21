@@ -4,7 +4,7 @@ using TMPro;
 
 public class WizardProjectile : MonoBehaviour
 {
-    public float speed = 5f;
+    public float speed = 8f;
     public int damage = 20;
     public GameObject explosionEffect;
     public GameObject damageText;
@@ -32,16 +32,27 @@ public class WizardProjectile : MonoBehaviour
             HealthManager hm = collision.gameObject.GetComponent<HealthManager>();
             if (hm != null)
             {
-                hm.TakeDamage(damage);
-                // Hasar yazısı
-                GameObject textObj = Instantiate(damageText, collision.transform.position + Vector3.up * 1.5f, Quaternion.identity);
-                TextMeshProUGUI text = textObj.GetComponentInChildren<TextMeshProUGUI>();
-                if (text != null)
-                {
-                    text.text = "-" + damage.ToString();
-                    text.color = Color.red;
+                if(collision.gameObject.GetComponent<PlayerController>().isDefending) {
+                    GameObject textObj = Instantiate(damageText, collision.transform.position + Vector3.up * 1.5f, Quaternion.identity);
+                    TextMeshProUGUI text = textObj.GetComponentInChildren<TextMeshProUGUI>();
+                    if (text != null)
+                    {
+                        text.text = "Blocked";
+                        text.color = Color.red;
+                    }
+                    Destroy(textObj, 1f);
+                } else {
+                    hm.TakeDamage(damage);
+                    // Hasar yazısı
+                    GameObject textObj = Instantiate(damageText, collision.transform.position + Vector3.up * 1.5f, Quaternion.identity);
+                    TextMeshProUGUI text = textObj.GetComponentInChildren<TextMeshProUGUI>();
+                    if (text != null)
+                    {
+                        text.text = "-" + damage.ToString();
+                        text.color = Color.red;
+                    }
+                    Destroy(textObj, 1f);
                 }
-                Destroy(textObj, 1f);
             }
             Explode();
         }
