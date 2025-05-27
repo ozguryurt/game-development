@@ -32,7 +32,8 @@ public class WizardProjectile : MonoBehaviour
             HealthManager hm = collision.gameObject.GetComponent<HealthManager>();
             if (hm != null)
             {
-                if(collision.gameObject.GetComponent<PlayerController>().isDefending) {
+                PlayerController playerController = collision.gameObject.GetComponent<PlayerController>();
+                if(playerController != null && playerController.isDefending) {
                     GameObject textObj = Instantiate(damageText, collision.transform.position + Vector3.up * 1.5f, Quaternion.identity);
                     TextMeshProUGUI text = textObj.GetComponentInChildren<TextMeshProUGUI>();
                     if (text != null)

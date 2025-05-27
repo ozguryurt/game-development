@@ -58,5 +58,6 @@ public class GameManager : MonoBehaviour
         // Karakter canlarını fulle
         player.GetComponent<HealthManager>().Heal(100);
         bot.GetComponent<HealthManager>().Heal(100);
+        
     }
 }

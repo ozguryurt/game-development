@@ -39,6 +39,10 @@ public class MainMenuController : MonoBehaviour
                 audioSource.volume = SAMPLE_SCENE_VOLUME;
             }
         }
+        else if (scene.name == "MainMenu")
+        {
+            PlayMenuMusic();
+        }
     }
 
     public void StartGame()
